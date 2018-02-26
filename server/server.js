@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const parser = require('body-parser');
 const path = require('path');
+const db = require('../database/database.js')
 
 const app = express();
 const port = 1337;
