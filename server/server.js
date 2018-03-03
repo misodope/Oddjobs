@@ -9,7 +9,7 @@ const session = require('express-session');
 const multer = require('multer');
 
 const app = express();
-const port = 1337;
+const port = process.env.PORT || 1337;
 const storage = multer.diskStorage({
   destination: path.join(__dirname, '/imageUploads'),
   filename(req, file, cb) {
