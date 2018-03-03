@@ -5,7 +5,7 @@ const BUILD_DIR = path.join(__dirname, '/client/src');
 const APP_DIR = path.join(__dirname, '/client/src/components');
 
 module.exports = {
-  entry: APP_DIR + '/app.jsx',
+  entry: BUILD_DIR + '/index.jsx',
   output: {
     path: BUILD_DIR,
     filename: 'bundle.js'
@@ -39,6 +39,18 @@ module.exports = {
             }
           }
         ]
+      },
+      {
+        test: /\.(png|jp(e*)g|svg)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192
+            }
+          }
+        ],
+        include: path.join(__dirname, '/server/imageUploads')
       }
     ]
   },

@@ -4,7 +4,7 @@ import AppFooter from './footer.jsx';
 import axios from 'axios';
 
 import MapComponent from './map.jsx';
-import Post from './post.jsx';
+import PostSecure from './postSecure.jsx';
 
 import 'grommet/scss/hpinc/index.scss';
 import GrommetApp from 'grommet/components/App';
@@ -19,19 +19,26 @@ import Hero from 'grommet/components/Hero';
 import Heading from 'grommet/components/Heading';
 import Image from 'grommet/components/Image';
 import Button from 'grommet/components/Button';
+import Spinning from 'grommet/components/icons/Spinning';
 
-class App extends React.Component {
+class AppSecure extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       address: 'New York, NY',
       search: '',
       posts: [],
-      successfulSearch: false
+      successfulSearch: false,
+      loading: true
     }
 
     this.onSearchChange = this.onSearchChange.bind(this);
     this.onSearchEnter = this.onSearchEnter.bind(this);
+    this.onLogout = this.onLogout.bind(this);
+  }
+
+  componentDidMount() {
+    setTimeout(() => this.setState({loading: false}), 1800)
   }
 
   onSearchChange(query) {
@@ -56,12 +63,26 @@ class App extends React.Component {
     }
   }
 
+  onLogout() {
+    axios.post('/logout')
+    .then(() => {
+      console.log('Logged out!');
+    })
+    .catch((error) => {
+      throw error;
+    })
+  }
+
   render() {
+    if (this.state.loading === true) {
+      return (<Spinning size='xlarge' style={{display:'block', margin: 'auto', top:'0', bottom:'0', left:'0', right:'0', position:'absolute'}}/>)
+    }
+
     let mainRender;
     if (this.state.successfulSearch === true) {
       mainRender =
       <div>
-        <Post posts={this.state.posts}/>
+        <PostSecure posts={this.state.posts}/>
       </div>
     } else {
       mainRender =
@@ -137,14 +158,19 @@ class App extends React.Component {
             icon={<MenuIcon />}
             dropAlign={{"right" : "right"}}
             >
-            <Anchor href='#' className='active'>
-              <Link to={'/loginPage'}>
-                Login
+            <Anchor href='/my/jobs'>
+              <Link to={'/my/jobs'}>
+                My Jobs
               </Link>
             </Anchor>
-            <Anchor href='#'>
-              <Link to={'/signupPage'}>
-                Sign Up
+            <Anchor href='/job/create'>
+              <Link to={'/job/create'}>
+                Create Job
+              </Link>
+            </Anchor>
+            <Anchor href='/' onClick={this.onLogout}>
+              <Link to={'/'}>
+                Logout
               </Link>
             </Anchor>
           </Menu>
@@ -155,4 +181,4 @@ class App extends React.Component {
   }
 }
 
-export default withRouter(App);
+export default withRouter(AppSecure);
