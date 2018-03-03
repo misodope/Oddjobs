@@ -130,4 +130,8 @@ app.get('/myPosted/jobs', auth, (req, res) => {
   })
 })
 
+app.get('/*', (req, res) => {
+  res.send(path.join(__dirname, '../client/src'));
+})
+
 app.listen(port, () => console.log("Connected to port:", port));
