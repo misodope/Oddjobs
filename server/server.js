@@ -7,17 +7,28 @@ const geocode = require('../helpers/geocoding.js');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 const multer = require('multer');
+const multerS3 = require('multer-s3');
+const aws = require('aws-sdk');
+
 
 const app = express();
 const port = process.env.PORT || 1337;
-const storage = multer.diskStorage({
-  destination: path.join(__dirname, '/imageUploads'),
-  filename(req, file, cb) {
-    cb(null, `${new Date().getUTCMilliseconds()}-${file.originalname}`);
-  }
+aws.config.update({
+    secretAccessKey: 'RLZ1n22WGw8v4zK9+HY/FGp0PQn80bKoqYUpkyyc',
+    accessKeyId: 'AKIAIRD4I6AUAU2YJRLA',
+    region: 'us-east-1'
 });
 
-const upload = multer({storage});
+const s3 = new aws.S3();
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'oddjobs-best',
+    key: function(req, file, cb) {
+      cb(null, `${new Date()}-${file.originalname}`);
+    }
+  })
+});
 
 let currentAddress;
 let currentLat;
@@ -43,7 +54,6 @@ let auth = function(req, res, next) {
 app.post('/search/posts', (req, res) => {
   db.getPosts(req.body, (results) => {
     if (results) {
-      console.log(results);
       res.send(results);
     }
   })
@@ -103,7 +113,7 @@ app.post('/logout', function(req, res) {
 
 app.post('/create/post', upload.any(), function(req, res) {
   if (req.session.username) {
-    const values = [currentAddress, currentLat, currentLng, req.body.brief, req.body.detailed, req.body.payment, req.files[0].filename, req.session.username];
+    const values = [currentAddress, currentLat, currentLng, req.body.brief, req.body.detailed, req.body.payment, req.files[0].location, req.session.username];
     db.createPost(values, (results) => {
       if (results) {
         res.send(results);
