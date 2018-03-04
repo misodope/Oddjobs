@@ -14,8 +14,8 @@ const aws = require('aws-sdk');
 const app = express();
 const port = process.env.PORT || 1337;
 aws.config.update({
-    secretAccessKey: 'RLZ1n22WGw8v4zK9+HY/FGp0PQn80bKoqYUpkyyc',
-    accessKeyId: 'AKIAIRD4I6AUAU2YJRLA',
+    secretAccessKey: process.env.AWS_SECRET,
+    accessKeyId: process.env.AWS_KEY,
     region: 'us-east-1'
 });
 
