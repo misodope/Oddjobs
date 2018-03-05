@@ -1,7 +1,7 @@
 import React from 'react';
 import GoogleSearchBox from './googleSearchBox.jsx';
 import axios from 'axios';
-import {Redirect} from 'react-router-dom'
+import {Redirect, withRouter} from 'react-router-dom'
 
 import 'grommet/scss/hpinc/index.scss';
 import Header from 'grommet/components/Header';
@@ -50,7 +50,6 @@ class Create extends React.Component {
       this.setState({
         submitError: true
       })
-      throw error;
     })
   }
 
@@ -124,4 +123,4 @@ class Create extends React.Component {
   }
 }
 
-export default Create;
+export default withRouter(Create);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import axios from 'axios';
 
 import MapComponent from './map.jsx';
@@ -20,32 +20,13 @@ import Paragraph from 'grommet/components/Paragraph';
 class Post extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      postAddress: '209 14th Street, Hoboken NJ',
-      postLat: null,
-      postLng: null
-    }
 
-    this.onClickPanel = this.onClickPanel.bind(this);
-  }
-
-  onClickPanel() {
-    axios.get('/job/location', {params: {address: this.state.postAddress}})
-    .then((results) =>{
-      this.setState({
-        postLat: results.data.lat,
-        postLng: results.data.lng
-      });
-    })
-    .catch((error) => {
-      console.log("There was an error getting coordinates", error)
-    })
   }
 
   render() {
     return (
       <GrommetApp>
-        <Accordion onActive={this.onClickPanel} animate={false}>
+        <Accordion animate={false}>
           {this.props.posts.map((post, i) =>
               <AccordionPanel heading={post.brief} key={i}>
               <Header>
@@ -59,6 +40,7 @@ class Post extends React.Component {
                 <Value icon={<MoneyIcon />}value={post.payment} units='Dollars'/>
               <Label>Pictures</Label>
               <img src={post.image} />
+              <Label>Location on the Map</Label>
               <MapComponent lat={parseFloat(post.lat)} lng={parseFloat(post.lng)}/>
             </AccordionPanel>
           )}
@@ -68,4 +50,4 @@ class Post extends React.Component {
   }
 }
 
-export default Post;
+export default withRouter(Post);

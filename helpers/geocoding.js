@@ -12,6 +12,15 @@ const getCoordinates = function(address, callback) {
   })
 };
 
+// app.get('/job/location', (req, res) => {
+//   geocode.getCoordinates(req.query.address, (results) => {
+//     if (results) {
+//       res.send(results);
+//     }
+//   });
+// });
+
+
 module.exports = {
   getCoordinates
 }

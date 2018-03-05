@@ -3,22 +3,19 @@ const axios = require('axios');
 const parser = require('body-parser');
 const path = require('path');
 const db = require('../database/database.js');
-const geocode = require('../helpers/geocoding.js');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const aws = require('aws-sdk');
 
-
 const app = express();
-const port = process.env.PORT || 1337;
+
 aws.config.update({
     secretAccessKey: process.env.AWS_SECRET,
     accessKeyId: process.env.AWS_KEY,
     region: 'us-east-1'
 });
-
 const s3 = new aws.S3();
 const upload = multer({
   storage: multerS3({
@@ -29,10 +26,6 @@ const upload = multer({
     }
   })
 });
-
-let currentAddress;
-let currentLat;
-let currentLng;
 
 app.use(session({
   secret:'2hard2know',
@@ -58,6 +51,10 @@ app.post('/search/posts', (req, res) => {
     }
   })
 });
+
+let currentAddress;
+let currentLat;
+let currentLng;
 
 app.post('/current/address', (req, res) => {
   currentAddress = req.body.location[0].formatted_address;
@@ -124,12 +121,24 @@ app.post('/create/post', upload.any(), function(req, res) {
   }
 })
 
-app.get('/job/location', (req, res) => {
-  geocode.getCoordinates(req.query.address, (results) => {
+app.post('/claim', auth, (req, res) => {
+  const values = {
+    postId: req.body.postId,
+    username: req.session.username
+  }
+  db.claimPost(values, (results) => {
     if (results) {
       res.send(results);
     }
-  });
+  })
+})
+
+app.get('/myClaimed/jobs', auth, (req, res) => {
+  db.getClaimed(req.session.username, (results) => {
+    if (results) {
+      res.send(results);
+    }
+  })
 });
 
 app.get('/myPosted/jobs', auth, (req, res) => {
@@ -138,10 +147,11 @@ app.get('/myPosted/jobs', auth, (req, res) => {
       res.send(results);
     }
   })
-})
+});
 
 app.get('/*', (req, res) => {
   res.send(path.join(__dirname, '../client/src'));
 })
 
+const port = process.env.PORT || 1337;
 app.listen(port, () => console.log("Connected to port:", port));

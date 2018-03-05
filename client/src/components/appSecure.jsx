@@ -9,6 +9,7 @@ import PostSecure from './postSecure.jsx';
 import 'grommet/scss/hpinc/index.scss';
 import GrommetApp from 'grommet/components/App';
 import Header from 'grommet/components/Header';
+import Headline from 'grommet/components/Headline';
 import Title from 'grommet/components/Title';
 import Box from 'grommet/components/Box';
 import Search from 'grommet/components/Search';
@@ -20,6 +21,10 @@ import Heading from 'grommet/components/Heading';
 import Image from 'grommet/components/Image';
 import Button from 'grommet/components/Button';
 import Spinning from 'grommet/components/icons/Spinning';
+import Layer from 'grommet/components/Layer';
+import Form from 'grommet/components/Form';
+import Label from 'grommet/components/Label';
+
 
 class AppSecure extends React.Component {
   constructor(props) {
@@ -29,12 +34,15 @@ class AppSecure extends React.Component {
       search: '',
       posts: [],
       successfulSearch: false,
-      loading: true
+      loading: true,
+      loggingOut: false,
+      showLayer: false
     }
 
     this.onSearchChange = this.onSearchChange.bind(this);
     this.onSearchEnter = this.onSearchEnter.bind(this);
     this.onLogout = this.onLogout.bind(this);
+    this.logoutLayer = this.logoutLayer.bind(this);
   }
 
   componentDidMount() {
@@ -66,16 +74,57 @@ class AppSecure extends React.Component {
   onLogout() {
     axios.post('/logout')
     .then(() => {
-      console.log('Logged out!');
+      this.setState({
+        loggingOut: true
+      })
     })
     .catch((error) => {
       throw error;
     })
   }
 
+  logoutLayer() {
+    this.setState({
+      showLayer: true
+    })
+  }
+
   render() {
     if (this.state.loading === true) {
       return (<Spinning size='xlarge' style={{display:'block', margin: 'auto', top:'0', bottom:'0', left:'0', right:'0', position:'absolute'}}/>)
+    }
+
+    let showLayer;
+    if (this.state.showLayer === true) {
+      showLayer =
+      <Layer
+        flush={false}
+        overlayClose={true}
+        closer={true}
+        onClose={() => this.setState({showLayer: false})}
+        >
+        <Box pad='medium' align='center'>
+          <Form onSubmit={this.onLogout}>
+            <Header>
+              <Headline>
+                Logging Out
+              </Headline>
+            </Header>
+              <Label>
+                Are you sure you want to logout?
+              </Label> <br />
+              <Button
+                label='Confirm'
+                primary={true}
+                type='submit'
+              />
+          </Form>
+        </Box>
+      </Layer>;
+    }
+
+    if (this.state.loggingOut === true) {
+      return (<Redirect to='/' />)
     }
 
     let mainRender;
@@ -87,7 +136,7 @@ class AppSecure extends React.Component {
     } else {
       mainRender =
       <div>
-        <Hero background={<Image src='http://www.handymanbc.ca/wp-content/uploads/2016/06/peak-services-icons.png'
+        <Hero background={<Image src="http://www.handymanbc.ca/wp-content/uploads/2016/06/peak-services-icons.png"
           fit='contain'
           full={true} />}
           backgroundColorIndex='dark'
@@ -130,8 +179,10 @@ class AppSecure extends React.Component {
         <AppFooter/>
       </div>;
     }
+
     return (
       <GrommetApp>
+        {showLayer}
         <Box flex={true} justify='end' direction='row' >
           <Header size='small' fixed={false} splash={false}>
             <Title>
@@ -168,10 +219,8 @@ class AppSecure extends React.Component {
                 Create Job
               </Link>
             </Anchor>
-            <Anchor href='/' onClick={this.onLogout}>
-              <Link to={'/'}>
-                Logout
-              </Link>
+            <Anchor onClick={this.logoutLayer}>
+              Logout
             </Anchor>
           </Menu>
         </Box>

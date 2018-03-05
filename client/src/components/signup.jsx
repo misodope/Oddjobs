@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Redirect, withRouter } from 'react-router-dom';
 import axios from 'axios';
 
 import 'grommet/scss/hpinc/index.scss';
@@ -52,7 +52,6 @@ class Signup extends React.Component {
         signedUpError: true,
         signedUp: false
       })
-      throw error;
     })
   };
 
@@ -116,4 +115,4 @@ class Signup extends React.Component {
   }
 }
 
-export default Signup;
+export default withRouter(Signup);

@@ -55,7 +55,7 @@ connection.query(postsTable, (error) => {
 })
 
 const getPosts = function(value, callback) {
-  const sqlQuery = `SELECT * FROM posts`;
+  const sqlQuery = `SELECT * FROM posts WHERE taken = 0`;
   connection.query(sqlQuery, (error, results) => {
     if (error) {
       callback(error);
@@ -66,7 +66,6 @@ const getPosts = function(value, callback) {
 }
 
 const createPost = function(value, callback) {
-  console.log(value);
   const sqlQuery = `INSERT INTO posts (address, lat, lng, brief, detailed, payment, image, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, (SELECT users.id FROM users WHERE users.email = '${value[value.length - 1]}'))`;
   connection.query(sqlQuery, value, (error, results) => {
     if (error) {
@@ -110,11 +109,35 @@ const getMyPosts = function(value, callback) {
   })
 }
 
+const claimPost = function(value, callback) {
+  const sqlQuery = `UPDATE posts SET taken_id = (SELECT users.id FROM users WHERE email="${value.username}"), taken = 1 WHERE id = ${value.postId}`;
+  connection.query(sqlQuery, (error, results) => {
+    if (error) {
+      callback(error);
+    } else {
+      callback(results);
+    }
+  })
+}
+
+const getClaimed = function(value, callback) {
+  const sqlQuery = `SELECT * FROM posts JOIN users on users.id = posts.taken_id AND users.email = "${value}"`;
+  connection.query(sqlQuery, (error, results) => {
+    if (error) {
+      callback(error);
+    } else {
+      callback(results);
+    }
+  })
+}
+
 module.exports = {
   connection,
   getPosts,
   checkUser,
   createUser,
   createPost,
-  getMyPosts
+  getMyPosts,
+  claimPost,
+  getClaimed
 }

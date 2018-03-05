@@ -36,7 +36,6 @@ class MapComponent extends React.PureComponent {
   }
 
   render() {
-    console.log(this.props.lat, this.props.lng)
     return (
       <MyMapComponent
         isMarkerShown

@@ -27,9 +27,6 @@ lifecycle({
       onPlacesChanged: () => {
         const places = refs.searchBox.getPlaces();
         axios.post('/current/address', {location: places})
-        .then(() => {
-          console.log('Success in sending address to server!', places)
-        })
         .catch((error) => {
           throw error
         })

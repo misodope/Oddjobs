@@ -32,7 +32,6 @@ class Login extends React.Component {
       this.setState({
         loginError: true
       });
-      throw error;
     })
   }
 
